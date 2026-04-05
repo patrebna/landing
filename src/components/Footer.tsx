@@ -140,7 +140,7 @@ export default function Footer() {
                     <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900">
                       <img
                         src={link.icon}
-                        alt=""
+                        alt="иконка проекта"
                         className="h-4 w-4 opacity-70 dark:invert"
                       />
                     </span>
@@ -166,7 +166,7 @@ export default function Footer() {
                     >
                       <img
                         src={link.icon}
-                        alt=""
+                        alt="иконка соцсети"
                         className="h-5 w-5 opacity-70 transition hover:opacity-100 hover:scale-110 dark:invert"
                       />
                     </a>
@@ -188,7 +188,7 @@ export default function Footer() {
                     >
                       <img
                         src={contact.icon}
-                        alt=""
+                        alt="иконка контакта"
                         className="h-4 w-4 opacity-70 transition hover:opacity-100 hover:scale-110 dark:invert"
                       />
                       {contact.label}
@@ -202,7 +202,7 @@ export default function Footer() {
         <div className="mt-10 flex justify-center md:mt-14">
           <img
             src={paymentMethodsUrl}
-            alt="Способы оплаты"
+            alt="способы оплаты"
             className="h-10 w-auto opacity-70 sm:h-12"
           />
         </div>
