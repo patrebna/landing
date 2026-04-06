@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X, Moon, Sun, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/useTheme";
+import logoUrl from "@/assets/logo.webp";
 
 const navItems = [
   { label: "О боте", href: "#about" },
@@ -18,11 +19,14 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/50 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-950/70">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-6">
-        <a href="#hero" className="flex items-center gap-2 text-xl font-semibold">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white">
-            P
-          </span>
-          PATREBNA
+        <a
+          href="#hero"
+          className="flex items-center gap-3 text-xl font-semibold"
+        >
+          <img src={logoUrl} alt="Patrebna" className="xl:h-10 h-8 w-auto" />
+          <div className="flex items-center gap-2">
+            <p className="xl:text-2xl lg:text-xl">PATREBNA</p>
+          </div>
         </a>
 
         <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
@@ -45,7 +49,20 @@ export default function Header() {
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <Button size="sm">Присоединиться</Button>
+          <Button
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              window.open(
+                "https://t.me/patrebnaBot?start=source_site",
+                "_blank",
+                "noopener,noreferrer",
+              );
+            }}
+          >
+            Перейти в бот
+            <ArrowUpRight size={16} />
+          </Button>
         </div>
 
         <button
@@ -79,8 +96,19 @@ export default function Header() {
             >
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <Button size="sm" className="w-full">
-              Подключиться
+            <Button
+              size="sm"
+              className="w-full gap-2"
+              onClick={() => {
+                window.open(
+                  "https://t.me/patrebnaBot?start=source_site",
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+              }}
+            >
+              Перейти в бот
+              <ArrowUpRight size={16} />
             </Button>
           </div>
         </div>
