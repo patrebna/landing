@@ -7,6 +7,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import lampUrl from "@/assets/images/lamp.webp";
 
 const advantages = [
   {
@@ -42,8 +43,20 @@ const advantages = [
 
 export default function AdvantagesSection() {
   return (
-    <section id="advantages" className="bg-slate-50 py-16 dark:bg-slate-950">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+    <section
+      id="advantages"
+      className="relative overflow-hidden bg-slate-50 py-16 dark:bg-slate-950"
+    >
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src={lampUrl}
+          alt=""
+          className="absolute right-6 bottom-12 w-[600px] hidden md:block rotate-[16deg] drop-shadow-[0_9px_8px_rgba(0,0,0,0.3)] opacity-90 dark:opacity-75"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
         <div className="space-y-3">
           <h2 className="section-title">Преимущества сервиса</h2>
           <p className="section-subtitle">

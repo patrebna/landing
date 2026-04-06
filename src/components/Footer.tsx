@@ -86,11 +86,13 @@ const contacts = [
   { label: "Телефон", icon: iconPhoneUrl, href: "tel:+375297413900" },
 ];
 
+const isExternalLink = (href: string) => href.startsWith("http");
+
 export default function Footer() {
   return (
     <footer className="border-t border-slate-200/60 bg-white/90 py-12 dark:border-slate-800 dark:bg-slate-950">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <div className="grid gap-10 md:grid-cols-3">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
           <div className="space-y-3">
             <div className="text-sm font-semibold uppercase tracking-wide text-slate-500">
               Patrebna
@@ -107,7 +109,7 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-            <div className="pt-2">
+            <div className="hidden pt-2 sm:block">
               <button
                 type="button"
                 onClick={() => {
@@ -136,6 +138,8 @@ export default function Footer() {
                   <a
                     href={link.href}
                     className="flex items-center gap-2 text-slate-600 transition hover:text-brand-primary dark:text-slate-300"
+                    target={isExternalLink(link.href) ? "_blank" : undefined}
+                    rel={isExternalLink(link.href) ? "noreferrer noopener" : undefined}
                   >
                     <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900">
                       <img
@@ -163,6 +167,8 @@ export default function Footer() {
                       href={link.href}
                       className="flex items-center gap-2 text-slate-600 transition hover:text-brand-primary dark:text-slate-300"
                       aria-label={link.label}
+                      target={isExternalLink(link.href) ? "_blank" : undefined}
+                      rel={isExternalLink(link.href) ? "noreferrer noopener" : undefined}
                     >
                       <img
                         src={link.icon}
@@ -185,6 +191,8 @@ export default function Footer() {
                     <a
                       href={contact.href}
                       className="flex items-center gap-2 text-slate-600 transition hover:text-brand-primary dark:text-slate-300"
+                      target={isExternalLink(contact.href) ? "_blank" : undefined}
+                      rel={isExternalLink(contact.href) ? "noreferrer noopener" : undefined}
                     >
                       <img
                         src={contact.icon}
@@ -197,6 +205,23 @@ export default function Footer() {
                 ))}
               </ul>
             </div>
+            <div className="pt-2 sm:hidden">
+              <button
+                type="button"
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-brand-primary dark:text-slate-300"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900">
+                  <ArrowUp
+                    size={14}
+                    className="opacity-70 transition hover:opacity-100 dark:text-slate-100"
+                  />
+                </span>
+                Наверх
+              </button>
+            </div>
           </div>
         </div>
         <div className="mt-10 flex justify-center md:mt-14">
@@ -204,6 +229,8 @@ export default function Footer() {
             src={paymentMethodsUrl}
             alt="способы оплаты"
             className="h-10 w-auto opacity-70 sm:h-12"
+            loading="lazy"
+            decoding="async"
           />
         </div>
         <div className="mt-4 text-center text-xs text-slate-500">

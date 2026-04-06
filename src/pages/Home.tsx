@@ -9,7 +9,7 @@ import SubscriptionSection from "@/sections/SubscriptionSection";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
+    <div className="relative min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
       <Header />
       <main>
         <HeroSection />

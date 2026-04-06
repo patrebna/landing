@@ -1,15 +1,16 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
+import plantUrl from "@/assets/images/plant.webp";
 
 const steps = [
   { title: "Запусти бота", text: "Найди PATREBNA в Telegram и нажми /start." },
   {
     title: "Пройди быструю регистрацию",
-    text: "Подтверди профиль и выбери интересующие категории.",
+    text: "Никаких заполнений — один клик.",
   },
   {
     title: "Добавь ссылку поиска",
-    text: "Вставь ссылку Kufar с нужными фильтрами.",
+    text: "Добавь ссылку на интересующие категории Kufar.",
   },
   {
     title: "Получай уведомления",
@@ -19,8 +20,17 @@ const steps = [
 
 export default function AboutSection() {
   return (
-    <section id="about" className="py-16 md:py-24">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+    <section id="about" className="relative overflow-hidden py-16 md:py-24">
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src={plantUrl}
+          alt=""
+          className="absolute hidden md:block md:left-[200px]  lg:left-[600px] -top-12 w-[360px] rotate-[-15deg] drop-shadow-[0_9px_8px_rgba(0,0,0,0.3)] opacity-90 dark:opacity-75"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
         <div className="grid gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-center">
           <div className="space-y-4">
             <h2 className="section-title">Как это работает</h2>
