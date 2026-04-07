@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -5,13 +6,25 @@ import { Card } from "@/components/ui/card";
 import monitorUrl from "@/assets/images/monitor.webp";
 import qrCodeUrl from "@/assets/qr-code.svg";
 
-const stats = [
-  { value: "500+", label: "пользователей" },
-  { value: "900 000+", label: "объявлений" },
-  { value: "24/7", label: "уведомления" },
-];
-
 export default function HeroSection() {
+  const [{ usersCount, adsCount }, setStats] = useState({
+    usersCount: 0,
+    adsCount: 0,
+  });
+
+  const stats = [
+    { value: usersCount, label: "пользователей" },
+    { value: adsCount, label: "объявлений" },
+    { value: "24/7", label: "уведомления" },
+  ];
+
+  useEffect(() => {
+    fetch("https://patrebna.by/api/stats")
+      .then((res) => res.json())
+      .then((data) => setStats(data))
+      .catch(console.error);
+  }, []);
+
   return (
     <section
       id="hero"
