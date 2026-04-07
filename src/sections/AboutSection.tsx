@@ -3,7 +3,10 @@ import { Card } from "@/components/ui/card";
 import plantUrl from "@/assets/images/plant.webp";
 
 const steps = [
-  { title: "Запусти бота", text: "Найди PATREBNA в Telegram и нажми /start." },
+  {
+    title: "Запусти бота",
+    text: "Переходи по ссылке в Telegram и нажми /start.",
+  },
   {
     title: "Пройди быструю регистрацию",
     text: "Никаких заполнений — один клик.",

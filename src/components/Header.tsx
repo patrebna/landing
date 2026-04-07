@@ -60,7 +60,7 @@ export default function Header() {
               );
             }}
           >
-            Перейти в бот
+            Перейти в бота
             <ArrowUpRight size={16} />
           </Button>
         </div>
