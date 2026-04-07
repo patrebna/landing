@@ -7,16 +7,11 @@ import monitorUrl from "@/assets/images/monitor.webp";
 import qrCodeUrl from "@/assets/qr-code.svg";
 
 export default function HeroSection() {
-  const [{ usersCount, adsCount }, setStats] = useState({
-    usersCount: 0,
-    adsCount: 0,
-  });
-
-  const stats = [
-    { value: usersCount, label: "пользователей" },
-    { value: adsCount, label: "объявлений" },
-    { value: "24/7", label: "уведомления" },
-  ];
+  const [stats, setStats] = useState<{
+    usersCount: number;
+    adsCount: number;
+  } | null>(null);
+  const [animated, setAnimated] = useState({ usersCount: 0, adsCount: 0 });
 
   useEffect(() => {
     fetch("https://patrebna.by/api/stats")
@@ -24,6 +19,36 @@ export default function HeroSection() {
       .then((data) => setStats(data))
       .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (!stats) return;
+    const duration = 1500;
+    const startTime = performance.now();
+
+    const animate = (time: number) => {
+      const progress = Math.min((time - startTime) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+
+      setAnimated({
+        usersCount: Math.floor(stats.usersCount * ease),
+        adsCount: Math.floor(stats.adsCount * ease),
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setAnimated({ usersCount: stats.usersCount, adsCount: stats.adsCount });
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [stats]);
+
+  const statsDisplay = [
+    { value: animated.usersCount, label: "пользователей" },
+    { value: animated.adsCount, label: "объявлений" },
+    { value: "24/7", label: "уведомления" },
+  ];
 
   return (
     <section
@@ -74,11 +99,11 @@ export default function HeroSection() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            {stats.map((stat) => (
-              <Card key={stat.label} className="glass-card text-center">
-                <div className="text-2xl font-semibold">{stat.value}</div>
+            {statsDisplay.map(({ value, label }) => (
+              <Card key={label} className="glass-card text-center">
+                <div className="text-2xl font-semibold">{value}</div>
                 <div className="text-xs text-slate-500 dark:text-slate-400">
-                  {stat.label}
+                  {label}
                 </div>
               </Card>
             ))}
