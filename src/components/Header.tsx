@@ -91,7 +91,7 @@ export default function Header() {
           <div className="mt-4 flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:border-brand-secondary hover:text-brand-secondary dark:border-slate-700 dark:text-slate-200"
+              className="flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:border-brand-secondary hover:text-brand-secondary dark:border-slate-700 dark:text-slate-200"
               aria-label="Переключить тему"
             >
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}

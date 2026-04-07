@@ -53,7 +53,7 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative overflow-hidden bg-hero-gradient pb-16 pt-16 md:pb-24"
+      className="relative overflow-hidden bg-hero-gradient pt-16 md:pb-24"
     >
       <div className="pointer-events-none hidden md:block absolute inset-0 z-0">
         <img

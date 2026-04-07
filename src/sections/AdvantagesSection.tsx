@@ -75,7 +75,7 @@ export default function AdvantagesSection() {
           {advantages.map((item) => (
             <Card key={item.title} className="glass-card">
               <div className="flex items-center gap-3">
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
+                <span className="flex min-h-12 min-w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
                   <item.icon size={22} />
                 </span>
                 <h3 className="text-lg font-semibold">{item.title}</h3>
