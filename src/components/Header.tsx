@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Menu, X, Moon, Sun, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/useTheme";
-import logoUrl from "@/assets/logo.webp";
+import logoUrl from "@/assets/logo.png";
 
 const navItems = [
   { label: "О боте", href: "#about" },
   { label: "Преимущества", href: "#advantages" },
-  { label: "FAQ", href: "#faq" },
   { label: "Отзывы", href: "#reviews" },
   { label: "Подписка", href: "#subscription" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 export default function Header() {
@@ -21,9 +21,17 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-6">
         <a
           href="#hero"
-          className="flex items-center gap-3 text-xl font-semibold"
+          className="flex items-end gap-1.5 text-xl font-semibold"
+          onClick={(event) => {
+            event.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
         >
-          <img src={logoUrl} alt="Patrebna" className="xl:h-10 h-8 w-auto" />
+          <img
+            src={logoUrl}
+            alt="Patrebna"
+            className="h-9 w-auto drop-shadow-[0_6px_14px_rgba(15,23,42,0.16)] xl:h-11 dark:drop-shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
+          />
           <div className="flex items-center gap-2">
             <p className="xl:text-2xl lg:text-xl">PATREBNA</p>
           </div>
@@ -44,7 +52,7 @@ export default function Header() {
         <div className="hidden items-center gap-3 md:flex">
           <button
             onClick={toggleTheme}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:border-brand-secondary hover:text-brand-secondary dark:border-slate-700 dark:text-slate-200"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all duration-200 ease-out hover:border-brand-primary hover:bg-emerald-50 hover:text-brand-primary dark:border-slate-700 dark:text-slate-200 dark:hover:border-emerald-500/50 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-300"
             aria-label="Переключить тему"
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
@@ -66,7 +74,7 @@ export default function Header() {
         </div>
 
         <button
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:border-brand-secondary hover:text-brand-secondary dark:border-slate-700 dark:text-slate-200 md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all duration-200 ease-out hover:border-brand-primary hover:bg-emerald-50 hover:text-brand-primary dark:border-slate-700 dark:text-slate-200 dark:hover:border-emerald-500/50 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-300 md:hidden"
           onClick={() => setIsOpen((prev) => !prev)}
           aria-label="Открыть меню"
         >
@@ -91,7 +99,7 @@ export default function Header() {
           <div className="mt-4 flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:border-brand-secondary hover:text-brand-secondary dark:border-slate-700 dark:text-slate-200"
+              className="flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all duration-200 ease-out hover:border-brand-primary hover:bg-emerald-50 hover:text-brand-primary dark:border-slate-700 dark:text-slate-200 dark:hover:border-emerald-500/50 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-300"
               aria-label="Переключить тему"
             >
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
