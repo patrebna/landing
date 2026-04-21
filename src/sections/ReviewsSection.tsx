@@ -29,7 +29,7 @@ export default function ReviewsSection() {
           <div className="space-y-3">
             <h2 className="section-title">Отзывы пользователей</h2>
             <p className="section-subtitle">
-              Люди уже нашли выгодные предложения с PATREBNA.
+              Люди уже нашли выгодные предложения с Patrebna.
             </p>
           </div>
           <div className="flex items-center gap-2">
