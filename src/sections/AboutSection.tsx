@@ -1,25 +1,7 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import plantUrl from "@/assets/images/plant.webp";
-
-const steps = [
-  {
-    title: "Запусти бота",
-    text: "Переходи по ссылке в Telegram и нажми /start.",
-  },
-  {
-    title: "Пройди быструю регистрацию",
-    text: "Никаких заполнений — один клик.",
-  },
-  {
-    title: "Добавь ссылку поиска",
-    text: "Добавь ссылку на интересующие категории Kufar.",
-  },
-  {
-    title: "Получай уведомления",
-    text: "Новые объявления приходят сразу после публикации.",
-  },
-];
+import { aboutItems } from "@/data/about";
 
 export default function AboutSection() {
   return (
@@ -38,9 +20,8 @@ export default function AboutSection() {
           <div className="space-y-4">
             <h2 className="section-title">Как это работает</h2>
             <p className="section-subtitle">
-              Patrebna — простой Telegram-бот для отслеживания новых объявлений
-              на Kufar. Настрой фильтры один раз и получай уведомления, когда
-              появляются подходящие предложения.
+              Параметры поиска задаются один раз — далее сервис регулярно
+              проверяет обновления и отправляет только релевантные объявления.
             </p>
           </div>
           <motion.div
@@ -50,14 +31,14 @@ export default function AboutSection() {
             transition={{ duration: 0.5 }}
             className="grid gap-4 sm:grid-cols-2"
           >
-            {steps.map((step, index) => (
-              <Card key={step.title} className="glass-card">
+            {aboutItems.map(({ title, text }, index) => (
+              <Card key={title} className="glass-card">
                 <div className="text-xs font-semibold uppercase text-emerald-500">
                   Шаг {index + 1}
                 </div>
-                <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                  {step.text}
+                <h3 className="mt-2 text-lg font-semibold">{title}</h3>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600 dark:text-slate-300">
+                  {text}
                 </p>
               </Card>
             ))}
