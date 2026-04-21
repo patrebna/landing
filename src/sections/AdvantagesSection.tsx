@@ -1,45 +1,8 @@
 import { motion } from "framer-motion";
-import {
-  BellRing,
-  ShieldCheck,
-  Sparkles,
-  Timer,
-  SlidersHorizontal,
-} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import lampUrl from "@/assets/images/lamp.webp";
-
-const advantages = [
-  {
-    title: "Получай первым новые объявления",
-    description:
-      "Бот отслеживает свежие публикации на Kufar в реальном времени и присылает уведомление.",
-    icon: BellRing,
-  },
-  {
-    title: "Гибкие фильтры поиска",
-    description:
-      "Настраивай категории, цену, регион и ключевые слова под свои цели.",
-    icon: SlidersHorizontal,
-  },
-  {
-    title: "Экономия времени",
-    description:
-      "Не нужно вручную обновлять сайт. Все объявления приходят прямо в Telegram.",
-    icon: Timer,
-  },
-  {
-    title: "Уведомления 24/7",
-    description:
-      "Patrebna работает круглосуточно и отслеживает новые объявления.",
-    icon: Sparkles,
-  },
-  {
-    title: "Безопасность",
-    description: "Бот не собирает личные данные и безопасен для пользователей.",
-    icon: ShieldCheck,
-  },
-];
+import { advantageItems } from "@/data/advantages";
+import { createElement } from "react";
 
 export default function AdvantagesSection() {
   return (
@@ -60,7 +23,7 @@ export default function AdvantagesSection() {
         <div className="space-y-3">
           <h2 className="section-title">Преимущества сервиса</h2>
           <p className="section-subtitle">
-            PATREBNA помогает быть быстрее конкурентов и находить выгодные
+            Patrebna помогает быть быстрее конкурентов и находить выгодные
             предложения сразу после публикации.
           </p>
         </div>
@@ -72,16 +35,16 @@ export default function AdvantagesSection() {
           transition={{ duration: 0.5 }}
           className="mt-10 grid gap-4 md:grid-cols-2"
         >
-          {advantages.map((item) => (
-            <Card key={item.title} className="glass-card">
+          {advantageItems.map(({ title, description, icon }) => (
+            <Card key={title} className="glass-card">
               <div className="flex items-center gap-3">
                 <span className="flex min-h-12 min-w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
-                  <item.icon size={22} />
+                  {createElement(icon, { size: 22 })}
                 </span>
-                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <h3 className="text-lg font-semibold">{title}</h3>
               </div>
               <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
-                {item.description}
+                {description}
               </p>
             </Card>
           ))}
