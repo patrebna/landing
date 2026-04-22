@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Menu, X, Moon, Sun, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/useTheme";
-import logoUrl from "@/assets/logo.png";
+import logoUrl from "@/assets/logo.webp";
 
 const navItems = [
   { label: "О боте", href: "#about" },
