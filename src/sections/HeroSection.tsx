@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
+import { Bot, MonitorCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import monitorUrl from "@/assets/images/monitor.webp";
 import qrCodeUrl from "@/assets/qr-code.svg";
 
 export default function HeroSection() {
+  const botUrl = "https://t.me/patrebnaBot?start=source_site";
   const [stats, setStats] = useState<{
     usersCount: number;
     adsCount: number;
@@ -73,20 +74,31 @@ export default function HeroSection() {
           className="space-y-6"
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300">
-            <CheckCircle size={14} />
+            <MonitorCheck size={14} />
             Новый способ мониторинга Kufar
           </div>
           <h1 className="text-4xl font-semibold leading-tight md:text-5xl">
             Лови новые объявления на Kufar первым
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300">
-            PATREBNA автоматически находит новые объявления и отправляет их
-            прямо в Telegram. Настрой фильтры один раз и будь первым, кто увидит
-            выгодное предложение.
+            <strong>Patrebna</strong> автоматически находит новые объявления и
+            отправляет их прямо в <strong>Telegram</strong>. Настрой фильтры
+            один раз и будь первым, кто увидит выгодное предложение.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button
               size="lg"
+              className="gap-2 px-8"
+              onClick={() => {
+                window.open(botUrl, "_blank", "noopener,noreferrer");
+              }}
+            >
+              <Bot size={24} />
+              Запустить бота
+            </Button>
+            <Button
+              size="lg"
+              variant="secondary"
               className="px-10"
               onClick={() => {
                 document.getElementById("about")?.scrollIntoView({
