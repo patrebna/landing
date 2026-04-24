@@ -29,7 +29,7 @@ export default function AdGallery({ images, title }: AdGalleryProps) {
         }`}
       >
         {hasGallery ? (
-          <div className="hidden md:flex md:h-[420px] md:flex-col md:items-center md:justify-center md:gap-3">
+          <div className="hidden md:flex md:h-[430px] md:flex-col md:items-center md:justify-center md:gap-3">
             <button
               type="button"
               onClick={() => mainSwiper?.slidePrev()}
@@ -100,7 +100,8 @@ export default function AdGallery({ images, title }: AdGalleryProps) {
               spaceBetween={10}
               slidesPerView={1}
               thumbs={{
-                swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
+                swiper:
+                  thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
               }}
               modules={[Navigation, Thumbs]}
               onSwiper={setMainSwiper}
@@ -150,7 +151,9 @@ export default function AdGallery({ images, title }: AdGalleryProps) {
                 <span
                   key={image}
                   className={`h-1.5 rounded-full transition-all ${
-                    index === activeIndex ? "w-6 bg-white/95" : "w-1.5 bg-white/55"
+                    index === activeIndex
+                      ? "w-6 bg-white/95"
+                      : "w-1.5 bg-white/55"
                   }`}
                 />
               ))}
