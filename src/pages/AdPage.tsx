@@ -461,13 +461,22 @@ export default function AdPage() {
                   href={`/ad/${id}`}
                   className="glass-card block overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"
                 >
-                  <img
-                    src={image}
-                    alt={title}
-                    className="aspect-square w-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={title}
+                      className="aspect-square w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <div className="flex aspect-square w-full flex-col items-center justify-center bg-slate-50 text-slate-400 dark:bg-slate-900/70 dark:text-slate-500">
+                      <ImageOff size={30} />
+                      <span className="mt-2 text-xs font-medium">
+                        Нет фото
+                      </span>
+                    </div>
+                  )}
                   <div className="space-y-2 p-4">
                     <div className="text-xl font-medium">
                       {getPriceText(price, remunerationType)}
