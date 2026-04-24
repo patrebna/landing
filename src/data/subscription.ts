@@ -25,8 +25,8 @@ export const plans: Tariff[] = [
     features: [
       { label: "Обновления раз в 60 минут", available: true },
       { label: "Отслеживание 1 ссылки", available: true },
-      { label: "Отсутствие рекламы", available: false },
       { label: "Приоритетная поддержка", available: false },
+      { label: "Отсутствие рекламы", available: false },
       { label: "Описание к каждому объявлению", available: false },
       {
         label: "Дополнительные параметры к объявлениям",
@@ -46,8 +46,8 @@ export const plans: Tariff[] = [
     features: [
       { label: "Обновления раз в 30 минут", available: true },
       { label: "Отслеживание 1 ссылки", available: true },
-      { label: "Отсутствие рекламы", available: true },
       { label: "Приоритетная поддержка", available: true },
+      { label: "Отсутствие рекламы", available: false },
       { label: "Описание к каждому объявлению", available: false },
       {
         label: "Дополнительные параметры к объявлениям",
@@ -70,8 +70,8 @@ export const plans: Tariff[] = [
     features: [
       { label: "Обновления раз в 5 минут", available: true },
       { label: "Отслеживание до 3 ссылок", available: true },
-      { label: "Отсутствие рекламы", available: true },
       { label: "Приоритетная поддержка", available: true },
+      { label: "Отсутствие рекламы", available: true },
       { label: "Описание к каждому объявлению", available: true },
       {
         label: "Дополнительные параметры к обявлениям",
