@@ -1,70 +1,55 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
+import { ChevronRight } from "lucide-react";
 import { useParams } from "react-router-dom";
-import {
-  CalendarDays,
-  ChevronRight,
-  ImageOff,
-  MapPin,
-  Star,
-  User,
-} from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AdGallery from "@/components/ad-page/AdGallery";
+import AdPageNotFound from "@/components/ad-page/AdPageNotFound";
+import AdPageSkeleton from "@/components/ad-page/AdPageSkeleton";
+import AdSummaryCard from "@/components/ad-page/AdSummaryCard";
+import RelatedAdsSection from "@/components/ad-page/RelatedAdsSection";
+import SellerCard from "@/components/ad-page/SellerCard";
 import { type IAd } from "@/data/ads";
-import mascotUrl from "@/assets/mascot.webp";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import axios from "axios";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode, Mousewheel, Navigation, Thumbs } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/free-mode";
-import "swiper/css/navigation";
-import "swiper/css/thumbs";
+import { formatDate } from "@/lib/adPage";
 
-type LoadingImageProps = {
-  src: string;
-  alt: string;
-  className: string;
-  wrapperClassName?: string;
-};
+function updateDocumentMeta(ad: IAd) {
+  const normalizedDescription = (ad.description ?? "").replace(/\s+/g, " ").trim();
+  const metaDescription =
+    normalizedDescription || `${ad.title ?? "Объявление"} на PATREBNA.`;
+  const pageTitle = `${ad.title ?? "Объявление"} | PATREBNA`;
+  const shareImage = ad.images?.[0] || `${window.location.origin}/og-image.png`;
 
-function LoadingImage({
-  src,
-  alt,
-  className,
-  wrapperClassName = "",
-}: LoadingImageProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
+  document.title = pageTitle;
 
-  return (
-    <div className={`relative flex items-center justify-center ${wrapperClassName}`}>
-      {!isLoaded ? (
-        <div className="absolute inset-0 flex items-center justify-center rounded-inherit bg-slate-100/80 dark:bg-slate-900/80">
-          <div className="h-7 w-7 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-500 dark:border-slate-700 dark:border-t-emerald-400" />
-        </div>
-      ) : null}
-      <img
-        src={src}
-        alt={alt}
-        className={className}
-        loading="lazy"
-        decoding="async"
-        onLoad={() => setIsLoaded(true)}
-      />
-    </div>
-  );
+  const upsertMeta = (
+    selector: string,
+    attributeName: "content" | "href",
+    value: string,
+  ) => {
+    const element = document.querySelector(selector);
+    if (element) {
+      element.setAttribute(attributeName, value);
+    }
+  };
+
+  upsertMeta('meta[name="description"]', "content", metaDescription);
+  upsertMeta('meta[property="og:title"]', "content", pageTitle);
+  upsertMeta('meta[property="og:description"]', "content", metaDescription);
+  upsertMeta('meta[property="og:url"]', "content", window.location.href);
+  upsertMeta('meta[property="og:image"]', "content", shareImage);
+  upsertMeta('meta[name="twitter:title"]', "content", pageTitle);
+  upsertMeta('meta[name="twitter:description"]', "content", metaDescription);
+  upsertMeta('meta[name="twitter:image"]', "content", shareImage);
+  upsertMeta('link[rel="canonical"]', "href", window.location.href);
 }
 
 export default function AdPage() {
   const { adId } = useParams<{ adId: string }>();
-
   const initialAdData = window.__AD_DATA__;
-  const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
-  const thumbsRef = useRef<any>(null);
-  const [mainSwiper, setMainSwiper] = useState<any>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
 
   const fetchData = async (): Promise<IAd> => {
     const { data } = await axios.get(`/api/ad/${adId}/details`);
@@ -87,206 +72,22 @@ export default function AdPage() {
     }
   }, [adId, initialAdData]);
 
-  const ads = adData?.seller?.isCompany
-    ? adData.partnerAds
-    : adData?.similarAds;
-
-  const updateDocumentMeta = (ad: IAd) => {
-    const normalizedDescription = (ad.description ?? "")
-      .replace(/\s+/g, " ")
-      .trim();
-    const metaDescription =
-      normalizedDescription || `${ad.title ?? "Объявление"} на PATREBNA.`;
-    const pageTitle = `${ad.title ?? "Объявление"} | PATREBNA`;
-    const shareImage =
-      ad.images?.[0] || `${window.location.origin}/og-image.png`;
-
-    document.title = pageTitle;
-
-    const upsertMeta = (
-      selector: string,
-      attributeName: "content" | "href",
-      value: string,
-    ) => {
-      const element = document.querySelector(selector);
-      if (element) {
-        element.setAttribute(attributeName, value);
-      }
-    };
-
-    upsertMeta('meta[name="description"]', "content", metaDescription);
-    upsertMeta('meta[property="og:title"]', "content", pageTitle);
-    upsertMeta('meta[property="og:description"]', "content", metaDescription);
-    upsertMeta('meta[property="og:url"]', "content", window.location.href);
-    upsertMeta('meta[property="og:image"]', "content", shareImage);
-    upsertMeta('meta[name="twitter:title"]', "content", pageTitle);
-    upsertMeta('meta[name="twitter:description"]', "content", metaDescription);
-    upsertMeta('meta[name="twitter:image"]', "content", shareImage);
-    upsertMeta('link[rel="canonical"]', "href", window.location.href);
-  };
-
-  const formatDate = (d: Date) => {
-    const isToday = d.toDateString() === new Date().toDateString();
-    if (isToday) {
-      return `Сегодня, ${d.toLocaleTimeString("ru-RU", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })}`;
-    }
-    return d.toLocaleDateString("ru-RU");
-  };
-
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [adId]);
-
   useEffect(() => {
     if (!adData) return;
     updateDocumentMeta(adData);
   }, [adData]);
 
   if (isLoading && !adData) {
-    return (
-      <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
-        <Header variant="compact" />
-        <main className="mx-auto max-w-6xl px-4 py-10 md:px-6">
-          <div className="mb-6 flex items-center gap-2 text-sm text-slate-300 dark:text-slate-700">
-            <div className="h-4 w-16 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-            <div className="h-4 w-4 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-            <div className="h-4 w-24 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-          </div>
-
-          <div className="grid w-full gap-8 md:grid-cols-[2fr_1fr]">
-            <section className="min-w-0 space-y-6">
-              <Card className="glass-card overflow-hidden p-0">
-                <div className="aspect-[4/4.9] w-full animate-pulse bg-slate-200 dark:bg-slate-800 md:h-[420px] md:aspect-auto" />
-              </Card>
-
-              <Card className="glass-card md:hidden">
-                <div className="space-y-3">
-                  <div className="h-8 w-32 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                  <div className="h-6 w-4/5 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                  <div className="flex justify-between gap-4">
-                    <div className="h-4 w-28 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                    <div className="h-4 w-20 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                  </div>
-                </div>
-              </Card>
-
-              <div className="h-12 w-full animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800 md:hidden" />
-
-              <Card className="glass-card">
-                <div className="h-6 w-32 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                <div className="mt-4 space-y-2">
-                  <div className="h-4 w-full animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                  <div className="h-4 w-full animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                  <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                </div>
-              </Card>
-
-              <Card className="glass-card">
-                <div className="h-6 w-40 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {Array.from({ length: 4 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
-                    >
-                      <div className="h-3 w-16 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                      <div className="mt-2 h-4 w-24 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </section>
-
-            <aside className="hidden space-y-6 md:block">
-              <Card className="glass-card">
-                <div className="space-y-3">
-                  <div className="h-8 w-32 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                  <div className="h-6 w-4/5 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                  <div className="flex justify-between gap-4">
-                    <div className="h-4 w-28 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                    <div className="h-4 w-20 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                  </div>
-                  <div className="mt-4 h-12 w-full animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" />
-                </div>
-              </Card>
-
-              <Card className="glass-card">
-                <div className="h-6 w-28 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                <div className="mt-4 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-16 w-16 animate-pulse rounded-lg bg-slate-200 dark:bg-slate-800" />
-                    <div className="space-y-2">
-                      <div className="h-4 w-28 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                      <div className="h-3 w-20 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                    </div>
-                  </div>
-                  <div className="h-4 w-10 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-                </div>
-              </Card>
-            </aside>
-          </div>
-        </main>
-        <Footer variant="compact" />
-      </div>
-    );
+    return <AdPageSkeleton />;
   }
 
   if (!adData) {
-    return (
-      <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
-        <Header variant="compact" />
-        <main className="mx-auto flex min-h-[70vh] max-w-4xl items-center px-4 py-16 md:px-6">
-          <Card className="glass-card w-full text-center">
-            <div className="relative mx-auto w-fit">
-              <div className="absolute left-1/2 top-[88%] h-6 w-36 -translate-x-1/2 rounded-full bg-slate-900/18 blur-lg dark:bg-black/55" />
-              <div className="absolute left-1/2 top-[94%] h-3 w-24 -translate-x-1/2 rounded-full bg-emerald-900/10 blur-md dark:bg-emerald-400/12" />
-              <img
-                src={mascotUrl}
-                alt="Маскот Patrebna"
-                className="relative mx-auto h-44 w-auto drop-shadow-[0_18px_24px_rgba(15,23,42,0.18)] md:h-56 dark:drop-shadow-[0_18px_28px_rgba(0,0,0,0.45)]"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <h1 className="md:mt-6 mt-4 md:text-4xl text-2xl font-semibold">
-              Объявление не найдено
-            </h1>
-            <p className="mx-auto md:mt-3 mt-2 max-w-xl text-base text-slate-500 dark:text-slate-400">
-              Скорее всего, его удалили или профиль продавца неактивен.
-            </p>
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Button
-                onClick={() => {
-                  window.location.href = "/";
-                }}
-              >
-                На главную
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  window.history.length > 1
-                    ? window.history.back()
-                    : (window.location.href = "/");
-                }}
-              >
-                Назад
-              </Button>
-            </div>
-          </Card>
-        </main>
-        <Footer variant="compact" />
-      </div>
-    );
+    return <AdPageNotFound />;
   }
 
-  const images = adData?.images ?? [];
-  const hasGallery = images.length > 1;
-  const characteristics = adData?.characteristics ?? [];
-  const seller = adData?.seller;
+  const seller = adData.seller;
+  const ads = seller?.isCompany ? adData.partnerAds : adData.similarAds;
+  const postedAtLabel = formatDate(new Date(adData.postedAt));
 
   return (
     <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
@@ -303,186 +104,32 @@ export default function AdPage() {
             {adData.category}
           </span>
         </nav>
+
         <div className="grid w-full gap-8 md:grid-cols-[2fr_1fr]">
           <section className="min-w-0 space-y-6">
-            <Card className="glass-card overflow-hidden">
-              <div
-                className={`grid gap-4 p-0 md:p-4 ${
-                  hasGallery ? "md:grid-cols-[96px_1fr]" : ""
-                }`}
+            <AdGallery images={adData.images ?? []} title={adData.title} />
+
+            <AdSummaryCard
+              ad={adData}
+              postedAtLabel={postedAtLabel}
+              className="md:hidden"
+              showButton={false}
+            />
+
+            <div className="md:hidden">
+              <Button
+                className="w-full"
+                onClick={() => {
+                  window.open(adData.kufarUrl, "_blank", "noopener,noreferrer");
+                }}
               >
-                {hasGallery && (
-                  <div className="hidden md:flex md:h-[420px] md:flex-col md:items-center md:justify-center md:gap-3">
-                    <button
-                      type="button"
-                      onClick={() => mainSwiper?.slidePrev()}
-                      className="z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow transition disabled:cursor-default disabled:opacity-45"
-                      aria-label="Предыдущие миниатюры"
-                      disabled={activeIndex === 0}
-                    >
-                      <ChevronRight className="-rotate-90" size={16} />
-                    </button>
-                    <Swiper
-                      direction="vertical"
-                      spaceBetween={3}
-                      slidesPerView={3.2}
-                      onSwiper={(swiper) => {
-                        thumbsRef.current = swiper;
-                        setThumbsSwiper(swiper);
-                      }}
-                      freeMode
-                      watchSlidesProgress
-                      slideToClickedSlide
-                      mousewheel
-                      grabCursor
-                      modules={[FreeMode, Thumbs, Mousewheel]}
-                      className="h-[340px] w-full"
-                    >
-                      {images.map((image, index) => (
-                        <SwiperSlide key={image}>
-                          <button
-                            type="button"
-                            onClick={() => mainSwiper?.slideTo(index)}
-                            className={`h-[104px] w-full overflow-hidden rounded-xl border-2 transition ${
-                              index === activeIndex
-                                ? "border-brand-primary"
-                                : "border-transparent hover:opacity-70"
-                            }`}
-                          >
-                            <LoadingImage
-                              src={image}
-                              alt="Миниатюра"
-                              className="h-full w-full cursor-pointer object-cover"
-                              wrapperClassName="h-full w-full rounded-xl"
-                            />
-                          </button>
-                        </SwiperSlide>
-                      ))}
-                    </Swiper>
-                    <button
-                      type="button"
-                      onClick={() => mainSwiper?.slideNext()}
-                      className="z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow transition disabled:cursor-default disabled:opacity-45"
-                      aria-label="Следующие миниатюры"
-                      disabled={activeIndex >= images.length - 1}
-                    >
-                      <ChevronRight className="rotate-90" size={16} />
-                    </button>
-                  </div>
-                )}
-
-                <div className="relative min-w-0">
-                  {hasGallery ? (
-                    <div className="absolute md:hidden block left-6 bottom-4 z-10 rounded-lg bg-slate-800/65 px-3.5 py-1.5 text-xs font-semibold text-white md:left-4 md:top-4 md:px-3 md:py-1 md:text-xs">
-                      {activeIndex + 1}/{images.length}
-                    </div>
-                  ) : null}
-                  {hasGallery ? (
-                    <Swiper
-                      spaceBetween={10}
-                      slidesPerView={1}
-                      thumbs={{
-                        swiper:
-                          thumbsSwiper && !thumbsSwiper.destroyed
-                            ? thumbsSwiper
-                            : null,
-                      }}
-                      modules={[Navigation, Thumbs]}
-                      onSwiper={setMainSwiper}
-                      onSlideChange={(swiper) =>
-                        setActiveIndex(swiper.activeIndex)
-                      }
-                      className="aspect-[4/4.9] w-full overflow-hidden md:h-[420px] md:aspect-auto"
-                    >
-                      {images.map((image) => (
-                        <SwiperSlide key={image}>
-                          <div className="flex h-full w-full items-center justify-center overflow-hidden">
-                            <LoadingImage
-                              src={image}
-                              alt={adData.title}
-                              className="block h-full w-max max-w-full rounded-2xl object-contain"
-                              wrapperClassName="h-full w-full"
-                            />
-                          </div>
-                        </SwiperSlide>
-                      ))}
-                    </Swiper>
-                  ) : images.length === 1 ? (
-                    <div className="flex aspect-[4/4.9] w-full items-center justify-center overflow-hidden rounded-2xl bg-slate-50 md:h-[420px] md:aspect-auto dark:bg-slate-800/20">
-                      <LoadingImage
-                        src={images[0]}
-                        alt={adData.title}
-                        className="block h-full w-max max-w-full rounded-2xl object-contain"
-                        wrapperClassName="h-full w-full"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex aspect-[4/4.9] w-full flex-col items-center justify-center rounded-2xl border border-slate-200/70 bg-slate-50 px-6 text-center md:h-[420px] md:aspect-auto dark:border-slate-800 dark:bg-slate-800/20">
-                      <ImageOff
-                        size={42}
-                        className="mb-3 text-slate-400 dark:text-slate-500"
-                      />
-                      <p className="text-base font-medium text-slate-700 dark:text-slate-200">
-                        Фото отсутствует
-                      </p>
-                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                        Продавец не добавил изображения к объявлению
-                      </p>
-                    </div>
-                  )}
-                  {hasGallery ? (
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center gap-1.5 px-4 pb-4 md:hidden">
-                      {images.map((image, index) => (
-                        <span
-                          key={image}
-                          className={`h-1.5 rounded-full transition-all ${
-                            index === activeIndex
-                              ? "w-6 bg-white/95"
-                              : "w-1.5 bg-white/55"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </Card>
-
-            <Card className="glass-card md:hidden">
-              <div className="space-y-2">
-                <div className="text-3xl mt-2 font-medium">
-                  {adData.price}
-                  {adData.price !== "Договорная" &&
-                    adData.price !== "Бесплатно" && (
-                      <span className="text-2xl ml-1 font-inter">ƃ</span>
-                    )}
-                </div>
-                <h1 className="text-xl font-semibold">{adData.title}</h1>
-                <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500"></div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                  <MapPin size={16} />
-                  {adData.location}
-                </div>
-                <p className="text-xs text-slate-500">
-                  {formatDate(new Date(adData.postedAt))}
-                </p>
-              </div>
-            </Card>
-
-            <Button
-              className="w-full md:hidden"
-              onClick={() => {
-                window.open(adData.kufarUrl, "_blank", "noopener,noreferrer");
-              }}
-            >
-              Перейти на Kufar
-            </Button>
+                Перейти на Kufar
+              </Button>
+            </div>
 
             <Card className="glass-card">
               <h2 className="text-lg font-semibold">Описание</h2>
-              <p className="mt-3 text-sm whitespace-pre-line text-slate-600 dark:text-slate-300">
+              <p className="mt-3 whitespace-pre-line text-sm text-slate-600 dark:text-slate-300">
                 {adData.description}
               </p>
             </Card>
@@ -490,7 +137,7 @@ export default function AdPage() {
             <Card className="glass-card">
               <h2 className="text-lg font-semibold">Характеристики</h2>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {characteristics.map(({ label, value }) => (
+                {(adData.characteristics ?? []).map(({ label, value }) => (
                   <div
                     key={label}
                     className="rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-900/60"
@@ -508,155 +155,22 @@ export default function AdPage() {
           </section>
 
           <aside className="space-y-6">
-            <Card className="glass-card hidden md:block">
-              <div className="space-y-2">
-                <div className="text-3xl mt-2 font-medium">
-                  {adData.price}
-                  {adData.price !== "Договорная" &&
-                    adData.price !== "Бесплатно" && (
-                      <span className="text-2xl ml-1 font-inter">ƃ</span>
-                    )}
-                </div>
-                <h1 className="text-xl font-semibold">{adData.title}</h1>
-                <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500"></div>
-              </div>
-              <div className="flex items-center justify-between mt-3">
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                  <MapPin size={16} />
-                  {adData.location}
-                </div>
-                <p className="text-xs text-slate-500">
-                  {formatDate(new Date(adData.postedAt))}
-                </p>
-              </div>
-              <Button
-                className="mt-4 w-full"
-                onClick={() => {
-                  window.open(adData.kufarUrl, "_blank", "noopener,noreferrer");
-                }}
-              >
-                Перейти на Kufar
-              </Button>
-            </Card>
-
-            <Card className="glass-card">
-              <h2 className="text-lg font-semibold">
-                {seller?.isCompany ? "Компания" : "Продавец"}
-              </h2>
-              <div className="mt-3 flex items-center justify-between gap-4 text-slate-600 dark:text-slate-400">
-                <div className="flex items-center gap-3">
-                  <div className="flex min-h-16 min-w-16 items-center justify-center overflow-hidden rounded-lg bg-slate-200 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                    {seller?.avatar ? (
-                      <LoadingImage
-                        src={seller.avatar}
-                        alt={seller.name}
-                        className="max-w-16 max-h-16 object-cover"
-                        wrapperClassName="max-h-16 max-w-16"
-                      />
-                    ) : (
-                      <User className="h-9 w-9 text-gray-600" />
-                    )}
-                  </div>
-                  <div>
-                    <div className="text-base font-normal">
-                      {seller?.name ?? "Неизвестный продавец"}
-                    </div>
-                    {(seller?.receivedCount ?? 0) > 0 && (
-                      <div className="text-xs text-slate-500">
-                        Оценок: {seller?.receivedCount}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {(seller?.overallScore ?? 0) > 0 && (
-                  <div className="flex items-center gap-1  text-md font-semibold">
-                    <Star
-                      className="text-amber-500"
-                      fill="currentColor"
-                      size={16}
-                    />
-                    {((seller?.overallScore ?? 0) * 5).toFixed(1)}
-                  </div>
-                )}
-              </div>
-            </Card>
+            <AdSummaryCard
+              ad={adData}
+              postedAtLabel={postedAtLabel}
+              className="hidden md:block"
+            />
+            <SellerCard seller={seller} />
           </aside>
         </div>
-        <section className="mt-12 space-y-4">
-          <h2 className="text-xl font-semibold">
-            {seller?.isCompany
-              ? "Другие объявления продавца"
-              : "Похожие объявления"}
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-            {ads?.map(
-              ({ id, image, title, price, postedAt, remunerationType }) => (
-                <a
-                  key={id}
-                  href={`/ad/${id}`}
-                  className="glass-card block overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"
-                >
-                  {image ? (
-                    <LoadingImage
-                      src={image}
-                      alt={title}
-                      className="aspect-square w-full object-cover"
-                      wrapperClassName="aspect-square w-full"
-                    />
-                  ) : (
-                    <div className="flex aspect-square w-full flex-col items-center justify-center bg-slate-50 text-slate-400 dark:bg-slate-900/70 dark:text-slate-500">
-                      <ImageOff size={30} />
-                      <span className="mt-2 text-xs font-medium">Нет фото</span>
-                    </div>
-                  )}
-                  <div className="space-y-2 p-4">
-                    <div className="text-xl font-medium">
-                      {getPriceText(price, remunerationType)}
-                      {showCurrency(price, remunerationType) && (
-                        <span className="text-lg ml-1 font-inter">ƃ</span>
-                      )}
-                    </div>
-                    <div className="text-base font-semibold">{title}</div>
-                    <div className="text-sm flex justify-items-end  items-center gap-1 text-slate-600">
-                      <CalendarDays size={16} />
-                      {formatDate(new Date(postedAt))}
-                    </div>
-                  </div>
-                </a>
-              ),
-            )}
-          </div>
-        </section>
+
+        <RelatedAdsSection
+          ads={ads}
+          isCompany={seller?.isCompany}
+          formatDate={formatDate}
+        />
       </main>
       <Footer variant="compact" />
     </div>
   );
 }
-
-const formatPrice = (value: number): string => {
-  const num = value / 100;
-  return new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: num < 1 ? 1 : 0,
-    maximumFractionDigits: num < 1 ? 2 : 0,
-  }).format(num);
-};
-
-const getPriceText = (price: number | string, remunerationType: string) => {
-  const numericPrice = Number(price);
-
-  if (remunerationType === "1") {
-    if (numericPrice > 0) {
-      return formatPrice(numericPrice);
-    }
-    return "Договорная";
-  }
-
-  if (remunerationType === "2") {
-    return "Бесплатно";
-  }
-
-  return numericPrice > 0 ? formatPrice(numericPrice) : "Бесплатно";
-};
-const showCurrency = (price: number | string, remunerationType: string) => {
-  return remunerationType !== "2" && Number(price) > 0;
-};
