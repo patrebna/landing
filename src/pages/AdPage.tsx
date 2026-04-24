@@ -44,6 +44,8 @@ export default function AdPage() {
     queryKey: ["ad", adId],
     queryFn: fetchData,
     enabled: Boolean(adId),
+    staleTime: 60 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
     initialData:
       initialAdData && initialAdData.id === adId ? initialAdData : undefined,
   });

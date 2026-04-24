@@ -23,7 +23,7 @@ export default function HeroSection() {
       }
       return response.json();
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 15 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   });
 
