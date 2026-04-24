@@ -4,6 +4,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Mousewheel, Navigation, Thumbs } from "swiper/modules";
 import { Card } from "@/components/ui/card";
 import LoadingImage from "./LoadingImage";
+import "swiper/css";
+import "swiper/css/free-mode";
+import "swiper/css/navigation";
+import "swiper/css/thumbs";
 
 type AdGalleryProps = {
   images: string[];
@@ -157,4 +161,3 @@ export default function AdGallery({ images, title }: AdGalleryProps) {
     </Card>
   );
 }
-
