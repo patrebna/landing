@@ -26,4 +26,5 @@ export interface ISimilarAd {
   title: string;
   price: number | string;
   postedAt: string;
+  remunerationType: string;
 }

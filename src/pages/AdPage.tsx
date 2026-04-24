@@ -24,47 +24,127 @@ import "swiper/css/thumbs";
 export default function AdPage() {
   const { adId } = useParams<{ adId: string }>();
 
-  const [adData, setData] = useState<IAd | undefined>();
+  const initialAdData = window.__AD_DATA__;
+  const [adData, setData] = useState<IAd | undefined>(() =>
+    initialAdData && initialAdData.id === adId ? initialAdData : undefined,
+  );
+  const [isLoading, setIsLoading] = useState(
+    () => !(initialAdData && initialAdData.id === adId),
+  );
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   const thumbsRef = useRef<any>(null);
   const [mainSwiper, setMainSwiper] = useState<any>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const ads = adData?.seller.isCompany ? adData.partnerAds : adData?.similarAds;
+  const ads = adData?.seller?.isCompany
+    ? adData.partnerAds
+    : adData?.similarAds;
 
   const fetchData = async () => {
-    const { data } = await axios.get(
-      `http://localhost:3000/api/ad/${adId}/details`,
-    );
-    setData(data);
+    try {
+      setIsLoading(true);
+      setLoadError(null);
+      const { data } = await axios.get(`/api/ad/${adId}/details`);
+      setData(data);
+    } catch (error) {
+      setData(undefined);
+      setLoadError("Не удалось загрузить объявление.");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const formatDate = (d: Date) =>
-    d.toDateString() === new Date().toDateString()
-      ? `Сегодня, ${d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}`
-      : `${d.toLocaleDateString("ru-RU")}, ${d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}`;
+  const updateDocumentMeta = (ad: IAd) => {
+    const normalizedDescription = (ad.description ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const metaDescription =
+      normalizedDescription || `${ad.title ?? "Объявление"} на PATREBNA.`;
+    const pageTitle = `${ad.title ?? "Объявление"} | PATREBNA`;
+    const shareImage =
+      ad.images?.[0] || `${window.location.origin}/og-image.png`;
+
+    document.title = pageTitle;
+
+    const upsertMeta = (
+      selector: string,
+      attributeName: "content" | "href",
+      value: string,
+    ) => {
+      const element = document.querySelector(selector);
+      if (element) {
+        element.setAttribute(attributeName, value);
+      }
+    };
+
+    upsertMeta('meta[name="description"]', "content", metaDescription);
+    upsertMeta('meta[property="og:title"]', "content", pageTitle);
+    upsertMeta('meta[property="og:description"]', "content", metaDescription);
+    upsertMeta('meta[property="og:url"]', "content", window.location.href);
+    upsertMeta('meta[property="og:image"]', "content", shareImage);
+    upsertMeta('meta[name="twitter:title"]', "content", pageTitle);
+    upsertMeta('meta[name="twitter:description"]', "content", metaDescription);
+    upsertMeta('meta[name="twitter:image"]', "content", shareImage);
+    upsertMeta('link[rel="canonical"]', "href", window.location.href);
+  };
+
+  const formatDate = (d: Date) => {
+    const isToday = d.toDateString() === new Date().toDateString();
+    if (isToday) {
+      return `Сегодня, ${d.toLocaleTimeString("ru-RU", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+    }
+    return d.toLocaleDateString("ru-RU");
+  };
 
   useEffect(() => {
-    fetchData();
-    if (!adData) return;
-    document.title = `${adData.title}`;
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute(
-        "content",
-        `${adData.title}. Цена ${adData.price} ${adData.category}. ${adData.location}.`,
-      );
+    setActiveIndex(0);
+
+    if (initialAdData && initialAdData.id === adId) {
+      setData(initialAdData);
+      window.__AD_DATA__ = undefined;
+      setIsLoading(false);
+      setLoadError(null);
+      return;
     }
-  }, []);
+
+    fetchData();
+  }, [adId]);
+
+  useEffect(() => {
+    if (!adData) return;
+    updateDocumentMeta(adData);
+  }, [adData]);
+
+  if (isLoading && !adData) {
+    return (
+      <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
+        <Header />
+        <main className="mx-auto max-w-4xl px-4 py-16 md:px-6">
+          <h1 className="text-2xl font-semibold">Загрузка объявления...</h1>
+          <p className="mt-2 text-slate-500">
+            Получаем актуальные данные и подготавливаем страницу.
+          </p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!adData) {
     return (
       <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
         <Header />
         <main className="mx-auto max-w-4xl px-4 py-16 md:px-6">
-          <h1 className="text-2xl font-semibold">Объявление не найдено</h1>
+          <h1 className="text-2xl font-semibold">
+            {loadError ?? "Объявление не найдено"}
+          </h1>
           <p className="mt-2 text-slate-500">
-            Проверьте ссылку или вернитесь на главную.
+            Проверьте ссылку, API-сервер или вернитесь на главную.
           </p>
         </main>
         <Footer />
@@ -74,7 +154,8 @@ export default function AdPage() {
 
   const images = adData?.images ?? [];
   const hasGallery = images.length > 1;
-  const canScrollThumbs = images.length > 3;
+  const characteristics = adData?.characteristics ?? [];
+  const seller = adData?.seller;
 
   return (
     <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
@@ -252,11 +333,11 @@ export default function AdPage() {
                 <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500"></div>
               </div>
               <div className="flex items-center justify-between">
-                <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+                <div className="flex items-center gap-2 text-sm text-slate-500">
                   <MapPin size={16} />
                   {adData.location}
                 </div>
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="text-xs text-slate-500">
                   {formatDate(new Date(adData.postedAt))}
                 </p>
               </div>
@@ -281,7 +362,7 @@ export default function AdPage() {
             <Card className="glass-card">
               <h2 className="text-lg font-semibold">Характеристики</h2>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {adData.characteristics.map(({ label, value }) => (
+                {characteristics.map(({ label, value }) => (
                   <div
                     key={label}
                     className="rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-900/60"
@@ -311,12 +392,12 @@ export default function AdPage() {
                 <h1 className="text-xl font-semibold">{adData.title}</h1>
                 <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500"></div>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+              <div className="flex items-center justify-between mt-3">
+                <div className="flex items-center gap-2 text-sm text-slate-500">
                   <MapPin size={16} />
                   {adData.location}
                 </div>
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="text-xs text-slate-500">
                   {formatDate(new Date(adData.postedAt))}
                 </p>
               </div>
@@ -332,15 +413,15 @@ export default function AdPage() {
 
             <Card className="glass-card">
               <h2 className="text-lg font-semibold">
-                {adData?.seller.isCompany ? "Компания" : "Продавец"}
+                {seller?.isCompany ? "Компания" : "Продавец"}
               </h2>
               <div className="mt-3 flex items-center justify-between gap-4 text-slate-600 dark:text-slate-400">
                 <div className="flex items-center gap-3">
                   <div className="flex min-h-16 min-w-16 items-center justify-center overflow-hidden rounded-lg bg-slate-200 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                    {adData.seller.avatar ? (
+                    {seller?.avatar ? (
                       <img
-                        src={adData.seller.avatar}
-                        alt={adData.seller.name}
+                        src={seller.avatar}
+                        alt={seller.name}
                         className="max-w-16 max-h-16 object-cover"
                         loading="lazy"
                         decoding="async"
@@ -351,23 +432,23 @@ export default function AdPage() {
                   </div>
                   <div>
                     <div className="text-base font-normal">
-                      {adData.seller.name}
+                      {seller?.name ?? "Неизвестный продавец"}
                     </div>
-                    {adData.seller.receivedCount > 0 && (
+                    {(seller?.receivedCount ?? 0) > 0 && (
                       <div className="text-xs text-slate-500">
-                        Оценок: {adData.seller.receivedCount}
+                        Оценок: {seller?.receivedCount}
                       </div>
                     )}
                   </div>
                 </div>
-                {adData.seller.overallScore > 0 && (
+                {(seller?.overallScore ?? 0) > 0 && (
                   <div className="flex items-center gap-1  text-md font-semibold">
                     <Star
                       className="text-amber-500"
                       fill="currentColor"
                       size={16}
                     />
-                    {(adData.seller.overallScore * 5).toFixed(1)}
+                    {((seller?.overallScore ?? 0) * 5).toFixed(1)}
                   </div>
                 )}
               </div>
@@ -376,39 +457,41 @@ export default function AdPage() {
         </div>
         <section className="mt-12 space-y-4">
           <h2 className="text-xl font-semibold">
-            {adData?.seller.isCompany
+            {seller?.isCompany
               ? "Другие объявления продавца"
               : "Похожие объявления"}
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-            {ads?.map(({ id, image, title, price, postedAt }) => (
-              <a
-                key={id}
-                href={`/ad/${id}`}
-                className="glass-card block overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"
-              >
-                <img
-                  src={image}
-                  alt={title}
-                  className="aspect-square w-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="space-y-2 p-4">
-                  <div className="text-xl font-medium">
-                    {formatPrice(price.toString())}
-                    {price !== "Договорная" && price !== "Бесплатно" && (
-                      <span className="text-lg ml-1 font-inter">ƃ</span>
-                    )}
+            {ads?.map(
+              ({ id, image, title, price, postedAt, remunerationType }) => (
+                <a
+                  key={id}
+                  href={`/ad/${id}`}
+                  className="glass-card block overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <img
+                    src={image}
+                    alt={title}
+                    className="aspect-square w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div className="space-y-2 p-4">
+                    <div className="text-xl font-medium">
+                      {getPriceText(price, remunerationType)}
+                      {showCurrency(price, remunerationType) && (
+                        <span className="text-lg ml-1 font-inter">ƃ</span>
+                      )}
+                    </div>
+                    <div className="text-base font-semibold">{title}</div>
+                    <div className="text-sm flex justify-items-end  items-center gap-1 text-slate-600">
+                      <CalendarDays size={16} />
+                      {formatDate(new Date(postedAt))}
+                    </div>
                   </div>
-                  <div className="text-base font-semibold">{title}</div>
-                  <div className="text-sm flex justify-items-end  items-center gap-1 text-slate-600">
-                    <CalendarDays size={16} />
-                    {formatDate(new Date(postedAt))}
-                  </div>
-                </div>
-              </a>
-            ))}
+                </a>
+              ),
+            )}
           </div>
         </section>
       </main>
@@ -417,10 +500,30 @@ export default function AdPage() {
   );
 }
 
-const formatPrice = (value: string): string => {
-  const num = +value / 100;
+const formatPrice = (value: number): string => {
+  const num = value / 100;
   return new Intl.NumberFormat("ru-RU", {
     minimumFractionDigits: num < 1 ? 1 : 0,
     maximumFractionDigits: num < 1 ? 2 : 0,
   }).format(num);
+};
+
+const getPriceText = (price: number | string, remunerationType: string) => {
+  const numericPrice = Number(price);
+
+  if (remunerationType === "1") {
+    if (numericPrice > 0) {
+      return formatPrice(numericPrice);
+    }
+    return "Договорная";
+  }
+
+  if (remunerationType === "2") {
+    return "Бесплатно";
+  }
+
+  return numericPrice > 0 ? formatPrice(numericPrice) : "Бесплатно";
+};
+const showCurrency = (price: number | string, remunerationType: string) => {
+  return remunerationType !== "2" && Number(price) > 0;
 };
