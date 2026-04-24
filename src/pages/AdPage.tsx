@@ -23,6 +23,40 @@ import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
 
+type LoadingImageProps = {
+  src: string;
+  alt: string;
+  className: string;
+  wrapperClassName?: string;
+};
+
+function LoadingImage({
+  src,
+  alt,
+  className,
+  wrapperClassName = "",
+}: LoadingImageProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <div className={`relative flex items-center justify-center ${wrapperClassName}`}>
+      {!isLoaded ? (
+        <div className="absolute inset-0 flex items-center justify-center rounded-inherit bg-slate-100/80 dark:bg-slate-900/80">
+          <div className="h-7 w-7 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-500 dark:border-slate-700 dark:border-t-emerald-400" />
+        </div>
+      ) : null}
+      <img
+        src={src}
+        alt={alt}
+        className={className}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setIsLoaded(true)}
+      />
+    </div>
+  );
+}
+
 export default function AdPage() {
   const { adId } = useParams<{ adId: string }>();
 
@@ -114,7 +148,7 @@ export default function AdPage() {
   if (isLoading && !adData) {
     return (
       <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
-        <Header />
+        <Header variant="compact" />
         <main className="mx-auto max-w-6xl px-4 py-10 md:px-6">
           <div className="mb-6 flex items-center gap-2 text-sm text-slate-300 dark:text-slate-700">
             <div className="h-4 w-16 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
@@ -195,7 +229,7 @@ export default function AdPage() {
             </aside>
           </div>
         </main>
-        <Footer />
+        <Footer variant="compact" />
       </div>
     );
   }
@@ -203,16 +237,20 @@ export default function AdPage() {
   if (!adData) {
     return (
       <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
-        <Header />
+        <Header variant="compact" />
         <main className="mx-auto flex min-h-[70vh] max-w-4xl items-center px-4 py-16 md:px-6">
           <Card className="glass-card w-full text-center">
-            <img
-              src={mascotUrl}
-              alt="Маскот Patrebna"
-              className="mx-auto md:h-56 h-44 w-auto"
-              loading="lazy"
-              decoding="async"
-            />
+            <div className="relative mx-auto w-fit">
+              <div className="absolute left-1/2 top-[88%] h-6 w-36 -translate-x-1/2 rounded-full bg-slate-900/18 blur-lg dark:bg-black/55" />
+              <div className="absolute left-1/2 top-[94%] h-3 w-24 -translate-x-1/2 rounded-full bg-emerald-900/10 blur-md dark:bg-emerald-400/12" />
+              <img
+                src={mascotUrl}
+                alt="Маскот Patrebna"
+                className="relative mx-auto h-44 w-auto drop-shadow-[0_18px_24px_rgba(15,23,42,0.18)] md:h-56 dark:drop-shadow-[0_18px_28px_rgba(0,0,0,0.45)]"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
             <h1 className="md:mt-6 mt-4 md:text-4xl text-2xl font-semibold">
               Объявление не найдено
             </h1>
@@ -240,7 +278,7 @@ export default function AdPage() {
             </div>
           </Card>
         </main>
-        <Footer />
+        <Footer variant="compact" />
       </div>
     );
   }
@@ -252,7 +290,7 @@ export default function AdPage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
-      <Header />
+      <Header variant="compact" />
       <main className="mx-auto max-w-6xl px-4 py-10 md:px-6">
         <nav className="mb-6 flex items-center gap-2 text-sm text-slate-500">
           <a href="/" className="transition hover:text-brand-primary">
@@ -311,12 +349,11 @@ export default function AdPage() {
                                 : "border-transparent hover:opacity-70"
                             }`}
                           >
-                            <img
+                            <LoadingImage
                               src={image}
                               alt="Миниатюра"
                               className="h-full w-full cursor-pointer object-cover"
-                              loading="lazy"
-                              decoding="async"
+                              wrapperClassName="h-full w-full rounded-xl"
                             />
                           </button>
                         </SwiperSlide>
@@ -360,12 +397,11 @@ export default function AdPage() {
                       {images.map((image) => (
                         <SwiperSlide key={image}>
                           <div className="flex h-full w-full items-center justify-center overflow-hidden">
-                            <img
+                            <LoadingImage
                               src={image}
                               alt={adData.title}
                               className="block h-full w-max max-w-full rounded-2xl object-contain"
-                              loading="lazy"
-                              decoding="async"
+                              wrapperClassName="h-full w-full"
                             />
                           </div>
                         </SwiperSlide>
@@ -373,12 +409,11 @@ export default function AdPage() {
                     </Swiper>
                   ) : images.length === 1 ? (
                     <div className="flex aspect-[4/4.9] w-full items-center justify-center overflow-hidden rounded-2xl bg-slate-50 md:h-[420px] md:aspect-auto dark:bg-slate-800/20">
-                      <img
+                      <LoadingImage
                         src={images[0]}
                         alt={adData.title}
                         className="block h-full w-max max-w-full rounded-2xl object-contain"
-                        loading="lazy"
-                        decoding="async"
+                        wrapperClassName="h-full w-full"
                       />
                     </div>
                   ) : (
@@ -512,12 +547,11 @@ export default function AdPage() {
                 <div className="flex items-center gap-3">
                   <div className="flex min-h-16 min-w-16 items-center justify-center overflow-hidden rounded-lg bg-slate-200 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                     {seller?.avatar ? (
-                      <img
+                      <LoadingImage
                         src={seller.avatar}
                         alt={seller.name}
                         className="max-w-16 max-h-16 object-cover"
-                        loading="lazy"
-                        decoding="async"
+                        wrapperClassName="max-h-16 max-w-16"
                       />
                     ) : (
                       <User className="h-9 w-9 text-gray-600" />
@@ -563,12 +597,11 @@ export default function AdPage() {
                   className="glass-card block overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"
                 >
                   {image ? (
-                    <img
+                    <LoadingImage
                       src={image}
                       alt={title}
                       className="aspect-square w-full object-cover"
-                      loading="lazy"
-                      decoding="async"
+                      wrapperClassName="aspect-square w-full"
                     />
                   ) : (
                     <div className="flex aspect-square w-full flex-col items-center justify-center bg-slate-50 text-slate-400 dark:bg-slate-900/70 dark:text-slate-500">
@@ -595,7 +628,7 @@ export default function AdPage() {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer variant="compact" />
     </div>
   );
 }
