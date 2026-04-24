@@ -12,6 +12,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { type IAd } from "@/data/ads";
+import mascotUrl from "@/assets/mascot.webp";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import axios from "axios";
@@ -36,11 +37,7 @@ export default function AdPage() {
     return data;
   };
 
-  const {
-    data: adData,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: adData, isLoading } = useQuery({
     queryKey: ["ad", adId],
     queryFn: fetchData,
     enabled: Boolean(adId),
@@ -207,13 +204,41 @@ export default function AdPage() {
     return (
       <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
         <Header />
-        <main className="mx-auto max-w-4xl px-4 py-16 md:px-6">
-          <h1 className="text-2xl font-semibold">
-            {error ? "Не удалось загрузить объявление." : "Объявление не найдено"}
-          </h1>
-          <p className="mt-2 text-slate-500">
-            Проверьте ссылку, API-сервер или вернитесь на главную.
-          </p>
+        <main className="mx-auto flex min-h-[70vh] max-w-4xl items-center px-4 py-16 md:px-6">
+          <Card className="glass-card w-full text-center">
+            <img
+              src={mascotUrl}
+              alt="Маскот Patrebna"
+              className="mx-auto md:h-56 h-44 w-auto"
+              loading="lazy"
+              decoding="async"
+            />
+            <h1 className="md:mt-6 mt-4 md:text-4xl text-2xl font-semibold">
+              Объявление не найдено
+            </h1>
+            <p className="mx-auto md:mt-3 mt-2 max-w-xl text-base text-slate-500 dark:text-slate-400">
+              Скорее всего, его удалили или профиль продавца неактивен.
+            </p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Button
+                onClick={() => {
+                  window.location.href = "/";
+                }}
+              >
+                На главную
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  window.history.length > 1
+                    ? window.history.back()
+                    : (window.location.href = "/");
+                }}
+              >
+                Назад
+              </Button>
+            </div>
+          </Card>
         </main>
         <Footer />
       </div>
@@ -548,9 +573,7 @@ export default function AdPage() {
                   ) : (
                     <div className="flex aspect-square w-full flex-col items-center justify-center bg-slate-50 text-slate-400 dark:bg-slate-900/70 dark:text-slate-500">
                       <ImageOff size={30} />
-                      <span className="mt-2 text-xs font-medium">
-                        Нет фото
-                      </span>
+                      <span className="mt-2 text-xs font-medium">Нет фото</span>
                     </div>
                   )}
                   <div className="space-y-2 p-4">
