@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Bot, MonitorCheck } from "lucide-react";
@@ -8,18 +9,23 @@ import qrCodeUrl from "@/assets/qr-code.svg";
 
 export default function HeroSection() {
   const botUrl = "https://t.me/patrebnaBot?start=source_site";
-  const [stats, setStats] = useState<{
-    usersCount: number;
-    adsCount: number;
-  } | null>(null);
   const [animated, setAnimated] = useState({ usersCount: 0, adsCount: 0 });
 
-  useEffect(() => {
-    fetch("https://patrebna.by/api/stats")
-      .then((res) => res.json())
-      .then((data) => setStats(data))
-      .catch(console.error);
-  }, []);
+  const { data: stats } = useQuery<{
+    usersCount: number;
+    adsCount: number;
+  }>({
+    queryKey: ["stats"],
+    queryFn: async () => {
+      const response = await fetch("/api/stats");
+      if (!response.ok) {
+        throw new Error("Не удалось загрузить статистику");
+      }
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
   useEffect(() => {
     if (!stats) return;

@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -25,36 +26,37 @@ export default function AdPage() {
   const { adId } = useParams<{ adId: string }>();
 
   const initialAdData = window.__AD_DATA__;
-  const [adData, setData] = useState<IAd | undefined>(() =>
-    initialAdData && initialAdData.id === adId ? initialAdData : undefined,
-  );
-  const [isLoading, setIsLoading] = useState(
-    () => !(initialAdData && initialAdData.id === adId),
-  );
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   const thumbsRef = useRef<any>(null);
   const [mainSwiper, setMainSwiper] = useState<any>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const fetchData = async (): Promise<IAd> => {
+    const { data } = await axios.get(`/api/ad/${adId}/details`);
+    return data;
+  };
+
+  const {
+    data: adData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["ad", adId],
+    queryFn: fetchData,
+    enabled: Boolean(adId),
+    initialData:
+      initialAdData && initialAdData.id === adId ? initialAdData : undefined,
+  });
+
+  useEffect(() => {
+    if (initialAdData && initialAdData.id === adId) {
+      window.__AD_DATA__ = undefined;
+    }
+  }, [adId, initialAdData]);
+
   const ads = adData?.seller?.isCompany
     ? adData.partnerAds
     : adData?.similarAds;
-
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      setLoadError(null);
-      const { data } = await axios.get(`/api/ad/${adId}/details`);
-      setData(data);
-    } catch (error) {
-      setData(undefined);
-      setLoadError("Не удалось загрузить объявление.");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const updateDocumentMeta = (ad: IAd) => {
     const normalizedDescription = (ad.description ?? "")
@@ -103,16 +105,6 @@ export default function AdPage() {
 
   useEffect(() => {
     setActiveIndex(0);
-
-    if (initialAdData && initialAdData.id === adId) {
-      setData(initialAdData);
-      window.__AD_DATA__ = undefined;
-      setIsLoading(false);
-      setLoadError(null);
-      return;
-    }
-
-    fetchData();
   }, [adId]);
 
   useEffect(() => {
@@ -141,7 +133,7 @@ export default function AdPage() {
         <Header />
         <main className="mx-auto max-w-4xl px-4 py-16 md:px-6">
           <h1 className="text-2xl font-semibold">
-            {loadError ?? "Объявление не найдено"}
+            {error ? "Не удалось загрузить объявление." : "Объявление не найдено"}
           </h1>
           <p className="mt-2 text-slate-500">
             Проверьте ссылку, API-сервер или вернитесь на главную.
