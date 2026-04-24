@@ -10,7 +10,7 @@ import SubscriptionSection from "@/sections/SubscriptionSection";
 export default function Home() {
   return (
     <div className="relative min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
-      <Header />
+      <Header variant="landing" />
       <main>
         <HeroSection />
         <AboutSection />
@@ -19,7 +19,7 @@ export default function Home() {
         <SubscriptionSection />
         <FAQSection />
       </main>
-      <Footer />
+      <Footer variant="landing" />
     </div>
   );
 }

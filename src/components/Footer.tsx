@@ -88,45 +88,57 @@ const contacts = [
 
 const isExternalLink = (href: string) => href.startsWith("http");
 
-export default function Footer() {
+type FooterProps = {
+  variant?: "landing" | "compact";
+};
+
+export default function Footer({ variant = "landing" }: FooterProps) {
+  const isCompact = variant === "compact";
+
   return (
     <footer className="border-t border-slate-200/60 bg-white/90 py-12 dark:border-slate-800 dark:bg-slate-950">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-          <div className="space-y-3">
-            <div className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Patrebna
+        <div
+          className={`grid gap-10 md:grid-cols-2 ${
+            isCompact ? "lg:grid-cols-2" : "lg:grid-cols-3"
+          }`}
+        >
+          {!isCompact ? (
+            <div className="space-y-3">
+              <div className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                Patrebna
+              </div>
+              <ul className="space-y-2 text-sm">
+                {menuLinks.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      className="text-slate-600 transition hover:text-brand-primary dark:text-slate-300"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <div className="hidden pt-2 sm:block">
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-brand-primary dark:text-slate-300"
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900">
+                    <ArrowUp
+                      size={14}
+                      className="opacity-70 transition hover:opacity-100 dark:text-slate-100"
+                    />
+                  </span>
+                  Наверх
+                </button>
+              </div>
             </div>
-            <ul className="space-y-2 text-sm">
-              {menuLinks.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-slate-600 transition hover:text-brand-primary dark:text-slate-300"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <div className="hidden pt-2 sm:block">
-              <button
-                type="button"
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-brand-primary dark:text-slate-300"
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900">
-                  <ArrowUp
-                    size={14}
-                    className="opacity-70 transition hover:opacity-100 dark:text-slate-100"
-                  />
-                </span>
-                Наверх
-              </button>
-            </div>
-          </div>
+          ) : null}
 
           <div className="space-y-3">
             <div className="text-sm font-semibold uppercase tracking-wide text-slate-500">
