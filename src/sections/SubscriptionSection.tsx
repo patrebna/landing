@@ -97,7 +97,7 @@ export default function SubscriptionSection() {
                             feature.label === "Отслеживание 1 ссылки");
                         const isHighlightedBaseFeature =
                           plan.name === "Базовый" &&
-                          (feature.label === "Обновления раз в 30 минут" ||
+                          (feature.label === "Обновления раз в 15 минут" ||
                             feature.label === "Отслеживание 1 ссылки");
 
                         return (

@@ -44,7 +44,7 @@ export const plans: Tariff[] = [
     description: "Базовый формат объявлений со средней частотой обновления.",
     note: "Регулярное использование",
     features: [
-      { label: "Обновления раз в 30 минут", available: true },
+      { label: "Обновления раз в 15 минут", available: true },
       { label: "Отслеживание 1 ссылки", available: true },
       { label: "Приоритетная поддержка", available: true },
       { label: "Отсутствие рекламы", available: false },
