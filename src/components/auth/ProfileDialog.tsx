@@ -3,6 +3,7 @@ import axios from "axios";
 import { ArrowUpRight, Gift, LogOut, Radio, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getProfileInitials, getTelegramDisplayName } from "@/lib/auth";
+import { authProfileQueryKey, fetchAuthProfile } from "@/lib/profile";
 import { type AuthSession, type UserStats } from "@/types/auth";
 
 type ProfileDialogProps = {
@@ -52,14 +53,8 @@ export default function ProfileDialog({
 
   const { telegramUser } = session;
   const { data, isLoading } = useQuery({
-    queryKey: ["auth-profile"],
-    queryFn: async () => {
-      const response = await axios.get<{ stats: UserStats | null }>(
-        "/api/auth/profile",
-        { withCredentials: true },
-      );
-      return response.data.stats;
-    },
+    queryKey: authProfileQueryKey,
+    queryFn: fetchAuthProfile,
     enabled: isOpen,
     staleTime: 5 * 60 * 1000,
   });
@@ -88,7 +83,7 @@ export default function ProfileDialog({
       return response.data.stats;
     },
     onSuccess: (stats) => {
-      queryClient.setQueryData(["auth-profile"], stats);
+      queryClient.setQueryData(authProfileQueryKey, stats);
     },
   });
 
@@ -143,20 +138,16 @@ export default function ProfileDialog({
               />
               <ProfileRow label="Подписка" value={subscriptionLabel} />
             </div>
-          ) : (
+          ) : !isLoading ? (
             <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50/90 p-5 dark:border-slate-700 dark:bg-slate-900/70">
               <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                {isLoading
-                  ? "Подгружаем профиль..."
-                  : "Профиль Patrebna пока не активирован"}
+                Профиль Patrebna пока не активирован
               </p>
               <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                {isLoading
-                  ? "Забираем статистику пользователя из базы и скоро покажем детали подписки."
-                  : "Telegram уже подключен, но в базе Patrebna вы еще не зарегистрированы. Перейдите в бота и завершите регистрацию, чтобы увидеть подписку, бонусы и отслеживаемые ссылки."}
+                Telegram уже подключен, но в базе Patrebna вы еще не зарегистрированы. Перейдите в бота и завершите регистрацию, чтобы увидеть подписку, бонусы и отслеживаемые ссылки.
               </p>
             </div>
-          )}
+          ) : null}
 
           {profile ? (
             <div className="mt-6 grid gap-3 sm:grid-cols-2">

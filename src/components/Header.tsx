@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
-import { Menu, X, Moon, Sun, SquareArrowOutUpRight } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  LoaderCircle,
+  Menu,
+  Moon,
+  SquareArrowOutUpRight,
+  Sun,
+  X,
+} from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/context/AuthContext";
 import { getProfileInitials, getTelegramDisplayName } from "@/lib/auth";
+import { authProfileQueryKey, fetchAuthProfile } from "@/lib/profile";
 import { type TelegramAuthPayload } from "@/types/auth";
 import logoUrl from "@/assets/logo.webp";
 import ProfileDialog from "@/components/auth/ProfileDialog";
@@ -43,6 +52,7 @@ function HeaderProfileSkeleton({ compact = false }: { compact?: boolean }) {
 export default function Header({ variant = "landing" }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isDesktop, setIsDesktop] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -51,6 +61,7 @@ export default function Header({ variant = "landing" }: HeaderProps) {
     return window.matchMedia("(min-width: 768px)").matches;
   });
   const { theme, toggleTheme } = useTheme();
+  const queryClient = useQueryClient();
   const { session, isHydrated, isAuthenticating, signInWithTelegram, signOut } =
     useAuth();
   const isCompact = variant === "compact";
@@ -82,6 +93,24 @@ export default function Header({ variant = "landing" }: HeaderProps) {
       setIsOpen(false);
     } catch (error) {
       console.error("Не удалось авторизоваться через Telegram", error);
+    }
+  };
+
+  const openProfileDialog = async () => {
+    setIsProfileLoading(true);
+
+    try {
+      await queryClient.fetchQuery({
+        queryKey: authProfileQueryKey,
+        queryFn: fetchAuthProfile,
+        staleTime: 5 * 60 * 1000,
+      });
+      setIsProfileDialogOpen(true);
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Не удалось загрузить данные профиля", error);
+    } finally {
+      setIsProfileLoading(false);
     }
   };
 
@@ -137,10 +166,15 @@ export default function Header({ variant = "landing" }: HeaderProps) {
               ) : session ? (
                 <button
                   type="button"
-                  onClick={() => setIsProfileDialogOpen(true)}
-                  className={`group flex h-11 min-w-[152px] items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 px-2.5 py-1.5 text-left text-slate-700 shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition-all duration-200 hover:border-brand-primary hover:shadow-[0_12px_24px_rgba(15,23,42,0.12)] dark:border-slate-700 dark:bg-slate-950/80 dark:text-slate-100 dark:hover:border-emerald-500/50 sm:min-w-[220px] ${
-                    isCompact ? "sm:px-3" : "px-3"
-                  }`}
+                  onClick={() => {
+                    void openProfileDialog();
+                  }}
+                  disabled={isProfileLoading}
+                  className={[
+                    "group flex h-11 min-w-[152px] items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 px-2.5 py-1.5 text-left text-slate-700 shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition-all duration-200 hover:border-brand-primary hover:shadow-[0_12px_24px_rgba(15,23,42,0.12)] dark:border-slate-700 dark:bg-slate-950/80 dark:text-slate-100 dark:hover:border-emerald-500/50 sm:min-w-[220px]",
+                    isCompact ? "sm:px-3" : "px-3",
+                    isProfileLoading ? "opacity-90" : "",
+                  ].join(" ")}
                   aria-label="Открыть профиль"
                 >
                   {session.telegramUser.photoUrl ? (
@@ -162,10 +196,17 @@ export default function Header({ variant = "landing" }: HeaderProps) {
                       Профиль
                     </span>
                   </span>
-                  <SquareArrowOutUpRight
-                    size={16}
-                    className="hidden text-slate-400 transition group-hover:text-brand-primary dark:text-slate-500 dark:group-hover:text-emerald-300 sm:block"
-                  />
+                  {isProfileLoading ? (
+                    <LoaderCircle
+                      size={16}
+                      className="hidden animate-spin text-brand-primary dark:text-emerald-300 sm:block"
+                    />
+                  ) : (
+                    <SquareArrowOutUpRight
+                      size={16}
+                      className="hidden text-slate-400 transition group-hover:text-brand-primary dark:text-slate-500 dark:group-hover:text-emerald-300 sm:block"
+                    />
+                  )}
                 </button>
               ) : (
                 <TelegramSignInControl
@@ -214,10 +255,13 @@ export default function Header({ variant = "landing" }: HeaderProps) {
                 <button
                   type="button"
                   onClick={() => {
-                    setIsProfileDialogOpen(true);
-                    setIsOpen(false);
+                    void openProfileDialog();
                   }}
-                  className="group flex h-11 min-w-[220px] items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 px-3 py-1.5 text-left text-slate-700 shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition-all duration-200 hover:border-brand-primary hover:shadow-[0_12px_24px_rgba(15,23,42,0.12)] dark:border-slate-700 dark:bg-slate-950/80 dark:text-slate-100 dark:hover:border-emerald-500/50"
+                  disabled={isProfileLoading}
+                  className={[
+                    "group flex h-11 min-w-[220px] items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 px-3 py-1.5 text-left text-slate-700 shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition-all duration-200 hover:border-brand-primary hover:shadow-[0_12px_24px_rgba(15,23,42,0.12)] dark:border-slate-700 dark:bg-slate-950/80 dark:text-slate-100 dark:hover:border-emerald-500/50",
+                    isProfileLoading ? "opacity-90" : "",
+                  ].join(" ")}
                   aria-label="Открыть профиль"
                 >
                   {session.telegramUser.photoUrl ? (
@@ -239,10 +283,17 @@ export default function Header({ variant = "landing" }: HeaderProps) {
                       Профиль
                     </span>
                   </span>
-                  <SquareArrowOutUpRight
-                    size={16}
-                    className="text-slate-400 transition group-hover:text-brand-primary dark:text-slate-500 dark:group-hover:text-emerald-300"
-                  />
+                  {isProfileLoading ? (
+                    <LoaderCircle
+                      size={16}
+                      className="animate-spin text-brand-primary dark:text-emerald-300"
+                    />
+                  ) : (
+                    <SquareArrowOutUpRight
+                      size={16}
+                      className="text-slate-400 transition group-hover:text-brand-primary dark:text-slate-500 dark:group-hover:text-emerald-300"
+                    />
+                  )}
                 </button>
               ) : (
                 <TelegramSignInControl
