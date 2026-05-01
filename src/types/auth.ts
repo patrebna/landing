@@ -32,5 +32,4 @@ export type UserStats = {
 
 export type AuthSession = {
   telegramUser: TelegramUser;
-  profile: null;
 };
