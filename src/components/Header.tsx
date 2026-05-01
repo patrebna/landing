@@ -69,6 +69,7 @@ export default function Header({ variant = "landing" }: HeaderProps) {
   const { session, isHydrated, isAuthenticating, signInWithTelegram, signOut } =
     useAuth();
   const isCompact = variant === "compact";
+  const isCompactMobile = isCompact && !isDesktop;
   const profileName = session
     ? getTelegramDisplayName(session.telegramUser)
     : "";
@@ -177,7 +178,7 @@ export default function Header({ variant = "landing" }: HeaderProps) {
                   disabled={isProfileLoading}
                   className={[
                     "group flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 py-1.5 text-left text-slate-700 shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition-all duration-200 hover:border-brand-primary hover:shadow-[0_12px_24px_rgba(15,23,42,0.12)] dark:border-slate-700 dark:bg-slate-950/80 dark:text-slate-100 dark:hover:border-emerald-500/50",
-                    isCompact
+                    isCompactMobile
                       ? "min-w-[136px] px-2.5"
                       : "min-w-[152px] px-3 sm:min-w-[220px]",
                     isProfileLoading ? "opacity-90" : "",
@@ -197,11 +198,11 @@ export default function Header({ variant = "landing" }: HeaderProps) {
                   )}
                   <span
                     className={`min-w-0 flex-1 ${
-                      isCompact ? "block" : "hidden sm:block"
+                      isCompactMobile ? "block" : "hidden sm:block"
                     }`}
                   >
                     <span className="block max-w-[132px] truncate text-sm font-semibold">
-                      {isCompact ? compactProfileName : profileName}
+                      {isCompactMobile ? compactProfileName : profileName}
                     </span>
                     <span className="block text-xs text-slate-500 dark:text-slate-400">
                       Профиль
@@ -211,14 +212,14 @@ export default function Header({ variant = "landing" }: HeaderProps) {
                     <LoaderCircle
                       size={16}
                       className={`animate-spin text-brand-primary dark:text-emerald-300 ${
-                        isCompact ? "block" : "hidden sm:block"
+                        isCompactMobile ? "block" : "hidden sm:block"
                       }`}
                     />
                   ) : (
                     <SquareArrowOutUpRight
                       size={16}
                       className={`text-slate-400 transition group-hover:text-brand-primary dark:text-slate-500 dark:group-hover:text-emerald-300 ${
-                        isCompact ? "block" : "hidden sm:block"
+                        isCompactMobile ? "block" : "hidden sm:block"
                       }`}
                     />
                   )}
@@ -226,6 +227,7 @@ export default function Header({ variant = "landing" }: HeaderProps) {
               ) : (
                 <TelegramSignInControl
                   compact={isCompact}
+                  mobileCompact={isCompactMobile}
                   isLoading={isAuthenticating}
                   onAuth={handleAuthAction}
                 />
