@@ -11,6 +11,7 @@ import iconPhoneUrl from "@/assets/icon-phone.svg";
 import { ArrowUp } from "lucide-react";
 import iconInstagramUrl from "@/assets/icon-instagram.svg";
 import iconThreadsUrl from "@/assets/icon-threads.svg";
+import iconFacebookUrl from "@/assets/icon-facebook.svg";
 import iconTiktokUrl from "@/assets/icon-tiktok.svg";
 
 const projectLinks = [
@@ -59,6 +60,11 @@ const socialLinks = [
     label: "Threads",
     href: "https://www.threads.com/@patrebna.by",
     icon: iconThreadsUrl,
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/patrebna.by",
+    icon: iconFacebookUrl,
   },
   {
     label: "TikTok",
