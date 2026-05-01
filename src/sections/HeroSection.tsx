@@ -72,7 +72,7 @@ export default function HeroSection() {
         />
       </div>
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_70%_70%,rgba(15,23,42,0.08),transparent_55%)] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(0,173,100,0.15),transparent_55%)]" />
-      <div className="relative z-10 mx-auto grid max-w-6xl gap-12 px-4 md:grid-cols-[0.95fr_1.05fr] md:items-stretch md:px-6">
+      <div className="relative z-10 mx-auto grid max-w-7xl gap-12 px-4 md:grid-cols-[0.95fr_1.05fr] md:items-stretch md:px-6">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}

@@ -19,7 +19,7 @@ export default function AdvantagesSection() {
           decoding="async"
         />
       </div>
-      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-6">
         <div className="space-y-3">
           <h2 className="section-title">Преимущества сервиса</h2>
           <p className="section-subtitle">

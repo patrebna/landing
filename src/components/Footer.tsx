@@ -97,7 +97,7 @@ export default function Footer({ variant = "landing" }: FooterProps) {
 
   return (
     <footer className="border-t border-slate-200/60 bg-white/90 py-12 dark:border-slate-800 dark:bg-slate-950">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
         <div
           className={`grid gap-10 md:grid-cols-2 ${
             isCompact ? "lg:grid-cols-2" : "lg:grid-cols-3"
@@ -151,7 +151,11 @@ export default function Footer({ variant = "landing" }: FooterProps) {
                     href={link.href}
                     className="flex items-center gap-2 text-slate-600 transition hover:text-brand-primary dark:text-slate-300"
                     target={isExternalLink(link.href) ? "_blank" : undefined}
-                    rel={isExternalLink(link.href) ? "noreferrer noopener" : undefined}
+                    rel={
+                      isExternalLink(link.href)
+                        ? "noreferrer noopener"
+                        : undefined
+                    }
                   >
                     <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900">
                       <img
@@ -180,7 +184,11 @@ export default function Footer({ variant = "landing" }: FooterProps) {
                       className="flex items-center gap-2 text-slate-600 transition hover:text-brand-primary dark:text-slate-300"
                       aria-label={link.label}
                       target={isExternalLink(link.href) ? "_blank" : undefined}
-                      rel={isExternalLink(link.href) ? "noreferrer noopener" : undefined}
+                      rel={
+                        isExternalLink(link.href)
+                          ? "noreferrer noopener"
+                          : undefined
+                      }
                     >
                       <img
                         src={link.icon}
@@ -203,8 +211,14 @@ export default function Footer({ variant = "landing" }: FooterProps) {
                     <a
                       href={contact.href}
                       className="flex items-center gap-2 text-slate-600 transition hover:text-brand-primary dark:text-slate-300"
-                      target={isExternalLink(contact.href) ? "_blank" : undefined}
-                      rel={isExternalLink(contact.href) ? "noreferrer noopener" : undefined}
+                      target={
+                        isExternalLink(contact.href) ? "_blank" : undefined
+                      }
+                      rel={
+                        isExternalLink(contact.href)
+                          ? "noreferrer noopener"
+                          : undefined
+                      }
                     >
                       <img
                         src={contact.icon}

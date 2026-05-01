@@ -17,7 +17,9 @@ import axios from "axios";
 import { formatDate } from "@/lib/adPage";
 
 function updateDocumentMeta(ad: IAd) {
-  const normalizedDescription = (ad.description ?? "").replace(/\s+/g, " ").trim();
+  const normalizedDescription = (ad.description ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
   const metaDescription =
     normalizedDescription || `${ad.title ?? "Объявление"} на PATREBNA.`;
   const pageTitle = `${ad.title ?? "Объявление"} | PATREBNA`;
@@ -92,7 +94,7 @@ export default function AdPage() {
   return (
     <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
       <Header variant="compact" />
-      <main className="mx-auto max-w-6xl px-4 py-10 md:px-6">
+      <main className="mx-auto max-w-7xl px-4 py-10 md:px-6">
         <nav className="mb-6 flex items-center gap-2 text-sm text-slate-500">
           <a href="/" className="transition hover:text-brand-primary">
             Главная

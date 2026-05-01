@@ -24,7 +24,7 @@ export default function ReviewsSection() {
 
   return (
     <section id="reviews" className="bg-slate-50 py-16 dark:bg-slate-950">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="space-y-3">
             <h2 className="section-title">Отзывы пользователей</h2>

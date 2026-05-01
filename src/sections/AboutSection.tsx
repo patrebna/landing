@@ -15,7 +15,7 @@ export default function AboutSection() {
           decoding="async"
         />
       </div>
-      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-6">
         <div className="grid gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-center">
           <div className="space-y-4">
             <h2 className="section-title">Как это работает</h2>

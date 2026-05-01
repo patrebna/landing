@@ -117,7 +117,7 @@ export default function Header({ variant = "landing" }: HeaderProps) {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-slate-200/50 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-950/70">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
           <a
             href={isCompact ? "/" : "#hero"}
             className="flex items-end gap-1.5 text-xl font-semibold"

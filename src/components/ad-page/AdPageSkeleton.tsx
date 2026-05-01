@@ -6,7 +6,7 @@ export default function AdPageSkeleton() {
   return (
     <div className="min-h-screen bg-white text-slate-900 dark:bg-brand-dark dark:text-slate-100">
       <Header variant="compact" />
-      <main className="mx-auto max-w-6xl px-4 py-10 md:px-6">
+      <main className="mx-auto max-w-7xl px-4 py-10 md:px-6">
         <div className="mb-6 flex items-center gap-2 text-sm text-slate-300 dark:text-slate-700">
           <div className="h-4 w-16 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
           <div className="h-4 w-4 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
@@ -90,4 +90,3 @@ export default function AdPageSkeleton() {
     </div>
   );
 }
-
